@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#F8F1E6">
-<title>宇誠＆婉儀｜互動式三折喜帖</title>
+<title>宇誠＆婉儀｜婚禮電子喜帖</title>
 <style>
 :root{--paper:#F8F1E6;--ink:#5f4c34}
 *{box-sizing:border-box}
@@ -41,10 +41,147 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
 
 
 @media(max-width:640px){body{padding-top:32px}.hint{font-size:12px}.flip-zone{left:20%;right:20%;height:30%}}
+
+
+
+
+@media (orientation: landscape) {
+  html, body {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  body {
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+  }
+
+  h1, .hint {
+    display: none !important;
+  }
+
+  .viewport {
+    position: relative;
+    width: min(100vw, calc(100vh * 1.5)) !important;
+    height: min(100vh, calc(100vw / 1.5)) !important;
+    max-width: none !important;
+    aspect-ratio: 3 / 2 !important;
+    margin: auto;
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .zoom-layer,
+  .stage,
+  .card {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .stage {
+    aspect-ratio: 3 / 2;
+  }
+}
+
+
+@media (orientation: landscape){
+  .panel,.face{
+    height:100% !important;
+  }
+  .center{
+    left:25% !important;
+    width:50% !important;
+  }
+  .left,.right{
+    width:25% !important;
+  }
+  .card{
+    transform-origin:50% 50% !important;
+  }
+}
+
+
+@media (orientation: landscape){
+  .viewport{
+    width: auto !important;
+    height: 92vh !important;
+    aspect-ratio: 3 / 2 !important;
+    max-width: calc(92vh * 1.5) !important;
+    margin: auto !important;
+  }
+
+  .zoom-layer,
+  .stage,
+  .card{
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .panel,
+  .face{
+    height: 100% !important;
+  }
+
+  body{
+    overflow: hidden !important;
+  }
+}
+
+
+/* 橫向模式：更保守的高度適配 */
+@media (orientation: landscape){
+  .viewport{
+    width: auto !important;
+    height: 86vh !important;
+    aspect-ratio: 3 / 2 !important;
+    max-width: calc(86vh * 1.5) !important;
+    margin: auto !important;
+  }
+}
+
+/* 類影片全螢幕覆蓋層 */
+.fullscreen-hint{
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  z-index:9999;
+  width:42px;
+  height:42px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,253,248,.72);
+  color:#6b5537;
+  font:20px system-ui,sans-serif;
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+  backdrop-filter:blur(6px);
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+}
+@media (orientation: portrait){
+  .fullscreen-hint{display:none;}
+}
+
 </style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="宇誠＆婉儀">
+<link rel="apple-touch-icon" href="icon-192.png">
+
 </head>
 <body>
-<h1>宇誠＆婉儀</h1>
+<h1>宇誠＆婉儀｜婚禮電子喜帖</h1>
 <p class="hint">左右拖曳翻折；從下緣往上拉翻面。兩指張開／捏合可放大縮小，縮放後會維持目前倍率。</p>
 
 <div class="viewport" id="viewport">
@@ -260,8 +397,83 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
 
   
 
-  render();
+
+  
+const fsBtn = document.getElementById('fsBtn');
+
+async function toggleFullscreen(){
+  const doc = document;
+  const elem = document.documentElement;
+
+  const enter =
+    elem.requestFullscreen ||
+    elem.webkitRequestFullscreen ||
+    elem.msRequestFullscreen;
+
+  const exit =
+    doc.exitFullscreen ||
+    doc.webkitExitFullscreen ||
+    doc.msExitFullscreen;
+
+  try{
+    if(!doc.fullscreenElement && !doc.webkitFullscreenElement){
+      if(enter){ await enter.call(elem); }
+    }else{
+      if(exit){ await exit.call(doc); }
+    }
+  }catch(e){
+    console.log(e);
+  }
+}
+
+if(fsBtn){
+  fsBtn.addEventListener('click',toggleFullscreen);
+  fsBtn.addEventListener('touchend',function(e){
+    e.preventDefault();
+    toggleFullscreen();
+  },{passive:false});
+}
+
+document.addEventListener('fullscreenchange',()=>{
+  if(fsBtn){
+    fsBtn.textContent=document.fullscreenElement?'×':'⛶';
+  }
+});
+
+document.addEventListener('webkitfullscreenchange',()=>{
+  if(fsBtn){
+    fsBtn.textContent=document.webkitFullscreenElement?'×':'⛶';
+  }
+});
+render();
 })();
 </script>
+
+<div class="fullscreen-hint" id="fsBtn" aria-label="全螢幕">⛶</div>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+
+
+<script>
+(function(){
+  const fsBtn = document.getElementById('fsBtn');
+  if(!fsBtn) return;
+  const supportsFullscreen = !!(
+    document.documentElement.requestFullscreen ||
+    document.documentElement.webkitRequestFullscreen
+  );
+  if(!supportsFullscreen){
+    fsBtn.title = '若瀏覽器不支援全螢幕，請加入主畫面後開啟';
+  }
+})();
+</script>
+
 </body>
 </html>
