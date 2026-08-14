@@ -145,29 +145,163 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
   }
 }
 
-/* 類影片全螢幕覆蓋層 */
-.fullscreen-hint{
-  position:fixed;
-  right:14px;
-  bottom:14px;
-  z-index:9999;
-  width:42px;
-  height:42px;
-  border-radius:999px;
+
+
+.form-link{
   display:flex;
+  justify-content:center;
+  margin:22px auto 14px;
+  padding:0 16px;
+}
+
+.form-link a{
+  display:inline-flex;
   align-items:center;
   justify-content:center;
-  background:rgba(255,253,248,.72);
+  min-width:min(86vw,320px);
+  padding:14px 24px;
+  border:1px solid rgba(139,111,70,.35);
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.72),rgba(248,241,230,.92));
   color:#6b5537;
-  font:20px system-ui,sans-serif;
-  box-shadow:0 4px 14px rgba(0,0,0,.12);
+  text-decoration:none;
+  font:600 17px/1.2 system-ui,"Noto Sans TC",sans-serif;
+  letter-spacing:.08em;
+  box-shadow:
+    0 8px 22px rgba(98,75,45,.10),
+    inset 0 1px 0 rgba(255,255,255,.75);
   backdrop-filter:blur(6px);
-  user-select:none;
-  -webkit-user-select:none;
-  touch-action:manipulation;
+  -webkit-backdrop-filter:blur(6px);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background .18s ease;
 }
-@media (orientation: portrait){
-  .fullscreen-hint{display:none;}
+
+.form-link a::before{
+  content:"✦";
+  margin-right:10px;
+  font-size:14px;
+  opacity:.75;
+}
+
+.form-link a::after{
+  content:"✦";
+  margin-left:10px;
+  font-size:14px;
+  opacity:.75;
+}
+
+.form-link a:active{
+  transform:scale(.97);
+  box-shadow:
+    0 4px 12px rgba(98,75,45,.12),
+    inset 0 1px 0 rgba(255,255,255,.6);
+}
+
+@media (orientation: landscape){
+  .form-link{
+    position:fixed;
+    left:50%;
+    bottom:10px;
+    transform:translateX(-50%);
+    z-index:999;
+    margin:0;
+    padding:0;
+  }
+
+  .form-link a{
+    min-width:220px;
+    padding:10px 18px;
+    font-size:14px;
+    background:rgba(255,253,248,.88);
+  }
+}
+
+
+
+@media (orientation: landscape){
+  html, body{
+    height:auto !important;
+    min-height:100% !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+  }
+
+  body{
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    align-items:center !important;
+    padding:16px 10px 28px !important;
+  }
+
+  .viewport{
+    flex:0 0 auto !important;
+    width:auto !important;
+    height:86vh !important;
+    aspect-ratio:3 / 2 !important;
+    max-width:calc(86vh * 1.5) !important;
+    margin:0 auto !important;
+  }
+
+  .form-link{
+    position:static !important;
+    left:auto !important;
+    bottom:auto !important;
+    transform:none !important;
+    z-index:auto !important;
+    margin:18px auto 8px !important;
+    padding:0 16px !important;
+  }
+
+  .form-link a{
+    min-width:min(72vw,320px) !important;
+    padding:12px 20px !important;
+    font-size:15px !important;
+  }
+}
+
+
+/* 最終橫向捲動修正：頁面可從喜帖區直接上下滑動 */
+@media (orientation: landscape){
+  html{
+    height:auto !important;
+    min-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    touch-action:pan-y !important;
+  }
+
+  body{
+    height:auto !important;
+    min-height:calc(100vh + 130px) !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:auto !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .viewport,
+  .stage{
+    touch-action:pan-y !important;
+  }
+
+  .drag-surface{
+    touch-action:pan-y !important;
+  }
+
+  /* 下緣翻面區仍保留垂直翻面手勢 */
+  .flip-zone{
+    touch-action:none !important;
+  }
+
+  .form-link{
+    flex:0 0 auto !important;
+    margin:22px auto 24px !important;
+  }
 }
 
 </style>
@@ -287,8 +421,9 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
   function beginFold(which,e){
     if(pointers.size>0)return;
     ++animId;
-    active={type:'fold',which,startX:e.clientX,startAmount:which==='left'?leftAmount:rightAmount,pid:e.pointerId};
-    e.currentTarget.setPointerCapture?.(e.pointerId); e.preventDefault();
+    active={type:'fold',which,startX:e.clientX,startY:e.clientY,startAmount:which==='left'?leftAmount:rightAmount,pid:e.pointerId};
+    if(!matchMedia('(orientation: landscape)').matches){e.currentTarget.setPointerCapture?.(e.pointerId);}
+
   }
 
   function beginFlip(e){
@@ -318,11 +453,21 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
     if(!active || active.pid!==e.pointerId)return;
     const rect=stage.getBoundingClientRect();
     if(active.type==='fold'){
-      const dx=e.clientX-active.startX, sensitivity=3.0/rect.width;
+      const dx=e.clientX-active.startX;
+      const dy=e.clientY-active.startY;
+
+      /* 橫向手機：若使用者主要是上下滑，就交給瀏覽器捲動頁面 */
+      if(matchMedia('(orientation: landscape)').matches && Math.abs(dy)>10 && Math.abs(dy)>Math.abs(dx)*1.15){
+        active=null;
+        return;
+      }
+
+      const sensitivity=3.0/rect.width;
       const delta=active.which==='left'?dx*sensitivity:-dx*sensitivity;
       const v=clamp(active.startAmount+delta,0,1);
       if(active.which==='left')leftAmount=v;else rightAmount=v;
-      render(); e.preventDefault();
+      render();
+      if(Math.abs(dx)>=Math.abs(dy)) e.preventDefault();
     } else {
       const dy=active.startY-e.clientY;
       active.progress=clamp(dy/(rect.height*.55),0,1);
@@ -394,64 +539,9 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
   }
   viewport.addEventListener('pointerup',removePointer);
   viewport.addEventListener('pointercancel',removePointer);
-
-  
-
-
-  
-const fsBtn = document.getElementById('fsBtn');
-
-async function toggleFullscreen(){
-  const doc = document;
-  const elem = document.documentElement;
-
-  const enter =
-    elem.requestFullscreen ||
-    elem.webkitRequestFullscreen ||
-    elem.msRequestFullscreen;
-
-  const exit =
-    doc.exitFullscreen ||
-    doc.webkitExitFullscreen ||
-    doc.msExitFullscreen;
-
-  try{
-    if(!doc.fullscreenElement && !doc.webkitFullscreenElement){
-      if(enter){ await enter.call(elem); }
-    }else{
-      if(exit){ await exit.call(doc); }
-    }
-  }catch(e){
-    console.log(e);
-  }
-}
-
-if(fsBtn){
-  fsBtn.addEventListener('click',toggleFullscreen);
-  fsBtn.addEventListener('touchend',function(e){
-    e.preventDefault();
-    toggleFullscreen();
-  },{passive:false});
-}
-
-document.addEventListener('fullscreenchange',()=>{
-  if(fsBtn){
-    fsBtn.textContent=document.fullscreenElement?'×':'⛶';
-  }
-});
-
-document.addEventListener('webkitfullscreenchange',()=>{
-  if(fsBtn){
-    fsBtn.textContent=document.webkitFullscreenElement?'×':'⛶';
-  }
-});
 render();
 })();
 </script>
-
-<div class="fullscreen-hint" id="fsBtn" aria-label="全螢幕">⛶</div>
-
-
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -460,20 +550,11 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
-
-<script>
-(function(){
-  const fsBtn = document.getElementById('fsBtn');
-  if(!fsBtn) return;
-  const supportsFullscreen = !!(
-    document.documentElement.requestFullscreen ||
-    document.documentElement.webkitRequestFullscreen
-  );
-  if(!supportsFullscreen){
-    fsBtn.title = '若瀏覽器不支援全螢幕，請加入主畫面後開啟';
-  }
-})();
-</script>
+<div class="form-link">
+<a href="https://docs.google.com/forms/d/e/1FAIpQLSewmdfTUdiDak1Z9oJ0RZ0blxqIcONW7fQYa8Q7NiDNdPrUSg/viewform?fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPNTY3MDY3MzQzMzUyNDI3AAGnhcjlD9DIIT_VmEZBtvNea5WEM_ozBL3Uoqxseu30cNCPIDVw-Kvjmuwtw4Y_aem_dXrz6mA1xJpQKOdoK3k9-g" target="_blank" rel="noopener">
+RSVP｜填寫婚宴回覆
+</a>
+</div>
 
 </body>
 </html>
