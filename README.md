@@ -1,15 +1,27 @@
-# 宇誠＆婉儀 婚禮電子喜帖 PWA
+# 宇誠＆婉儀｜婚禮電子喜帖 PWA 最終版
 
-把本資料夾所有檔案上傳到 GitHub Pages 儲存庫根目錄即可。
+請將本資料夾內所有檔案上傳到 GitHub Pages 儲存庫根目錄：
 
-必要檔案：
 - index.html
 - manifest.webmanifest
 - sw.js
 - icon-192.png
 - icon-512.png
 
-在 Android Chrome 可使用「加到主畫面／安裝應用程式」。
-在 iPhone Safari 可使用「分享 → 加入主畫面」。
+## GitHub Pages
+Settings → Pages → Deploy from a branch → main / (root)
 
-從主畫面啟動後會以 standalone 模式開啟，效果會比一般瀏覽器更接近全螢幕 App。
+## Android Chrome
+開啟網站 → 右上角 ⋮ → 安裝應用程式 / 加到主畫面
+
+## iPhone Safari
+開啟網站 → 分享 → 加入主畫面
+
+此版本包含：
+- 三折互動翻頁
+- 下往上翻面
+- 雙指縮放
+- 橫向高度適配
+- 橫向頁面可上下滾動
+- RSVP Google 表單按鈕
+- PWA standalone 模式
