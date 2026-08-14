@@ -304,6 +304,82 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
   }
 }
 
+
+.countdown-section,
+.map-section{
+  width:min(92vw,760px);
+  margin:20px auto 0;
+  text-align:center;
+  font-family:system-ui,"Noto Sans TC",sans-serif;
+}
+
+.countdown-title,
+.map-title{
+  margin-bottom:10px;
+  color:#6b5537;
+  font-size:16px;
+  letter-spacing:.08em;
+}
+
+.countdown-box{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  padding:14px;
+  border:1px solid rgba(139,111,70,.25);
+  border-radius:18px;
+  background:rgba(255,253,248,.72);
+  box-shadow:0 8px 22px rgba(98,75,45,.08);
+}
+
+.countdown-item{
+  padding:8px 4px;
+}
+
+.countdown-number{
+  display:block;
+  font-size:clamp(22px,6vw,34px);
+  font-weight:700;
+  color:#6b5537;
+}
+
+.countdown-label{
+  display:block;
+  margin-top:2px;
+  font-size:12px;
+  color:#8a7658;
+}
+
+.map-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:min(86vw,320px);
+  padding:14px 24px;
+  border:1px solid rgba(139,111,70,.35);
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(248,241,230,.92));
+  color:#6b5537;
+  text-decoration:none;
+  font:600 16px/1.2 system-ui,"Noto Sans TC",sans-serif;
+  letter-spacing:.06em;
+  box-shadow:0 8px 22px rgba(98,75,45,.10);
+}
+
+.map-address{
+  margin-top:8px;
+  font-size:12px;
+  color:#8a7658;
+  line-height:1.5;
+}
+
+@media (orientation: landscape){
+  .countdown-section,
+  .map-section{
+    width:min(80vw,680px);
+  }
+}
+
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -550,11 +626,72 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
+
+<section class="countdown-section" aria-label="婚禮倒數">
+  <div class="countdown-title">距離婚禮還有</div>
+  <div class="countdown-box">
+    <div class="countdown-item"><span class="countdown-number" id="cdDays">--</span><span class="countdown-label">天</span></div>
+    <div class="countdown-item"><span class="countdown-number" id="cdHours">--</span><span class="countdown-label">時</span></div>
+    <div class="countdown-item"><span class="countdown-number" id="cdMinutes">--</span><span class="countdown-label">分</span></div>
+    <div class="countdown-item"><span class="countdown-number" id="cdSeconds">--</span><span class="countdown-label">秒</span></div>
+  </div>
+</section>
+
+<section class="map-section" aria-label="婚宴地圖導航">
+  <div class="map-title">婚宴地點導航</div>
+  <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%A1%83%E5%9C%92%E5%B8%82%E6%A1%83%E5%9C%92%E5%8D%80%E4%B8%AD%E6%AD%A3%E8%B7%AF19%E8%99%9F%20%E6%96%B0%E5%85%89%E4%B8%89%E8%B6%8A%E6%A1%83%E5%9C%92%E7%AB%99%E5%89%8D%E5%BA%9711%E6%A8%93" target="_blank" rel="noopener">
+    📍 開啟 Google 地圖導航
+  </a>
+  <div class="map-address">桃園市桃園區中正路19號<br>新光三越桃園站前店 11 樓</div>
+</section>
+
 <div class="form-link">
 <a href="https://docs.google.com/forms/d/e/1FAIpQLSewmdfTUdiDak1Z9oJ0RZ0blxqIcONW7fQYa8Q7NiDNdPrUSg/viewform?fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPNTY3MDY3MzQzMzUyNDI3AAGnhcjlD9DIIT_VmEZBtvNea5WEM_ozBL3Uoqxseu30cNCPIDVw-Kvjmuwtw4Y_aem_dXrz6mA1xJpQKOdoK3k9-g" target="_blank" rel="noopener">
 RSVP｜填寫婚宴回覆
 </a>
 </div>
+
+
+<script>
+(function(){
+  const weddingTime = new Date('2026-09-13T18:00:00+08:00').getTime();
+
+  function updateCountdown(){
+    const now = Date.now();
+    let diff = weddingTime - now;
+
+    const d = document.getElementById('cdDays');
+    const h = document.getElementById('cdHours');
+    const m = document.getElementById('cdMinutes');
+    const s = document.getElementById('cdSeconds');
+
+    if(!d || !h || !m || !s) return;
+
+    if(diff <= 0){
+      d.textContent = '0';
+      h.textContent = '0';
+      m.textContent = '0';
+      s.textContent = '0';
+      return;
+    }
+
+    const days = Math.floor(diff / 86400000);
+    diff %= 86400000;
+    const hours = Math.floor(diff / 3600000);
+    diff %= 3600000;
+    const minutes = Math.floor(diff / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+
+    d.textContent = days;
+    h.textContent = String(hours).padStart(2,'0');
+    m.textContent = String(minutes).padStart(2,'0');
+    s.textContent = String(seconds).padStart(2,'0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown,1000);
+})();
+</script>
 
 </body>
 </html>
