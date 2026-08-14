@@ -380,6 +380,97 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
   }
 }
 
+
+/* 直向頁面也允許上下滾動 */
+@media (orientation: portrait){
+  html{
+    height:auto !important;
+    min-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    touch-action:pan-y !important;
+  }
+
+  body{
+    height:auto !important;
+    min-height:calc(100vh + 160px) !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:auto !important;
+    touch-action:pan-y !important;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:28px !important;
+  }
+
+  .viewport,
+  .stage,
+  .drag-surface{
+    touch-action:pan-y !important;
+  }
+
+  /* 喜帖下緣仍保留上拉翻面的手勢 */
+  .flip-zone{
+    touch-action:none !important;
+  }
+
+  .countdown-section,
+  .map-section,
+  .form-link{
+    flex:0 0 auto !important;
+  }
+}
+
+
+.parking-section{
+  width:min(92vw,760px);
+  margin:18px auto 0;
+  text-align:center;
+  font-family:system-ui,"Noto Sans TC",sans-serif;
+}
+
+.parking-title{
+  margin-bottom:10px;
+  color:#6b5537;
+  font-size:16px;
+  letter-spacing:.08em;
+}
+
+.parking-buttons{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+}
+
+.parking-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:min(86vw,360px);
+  padding:12px 20px;
+  border:1px solid rgba(139,111,70,.30);
+  border-radius:999px;
+  background:rgba(255,253,248,.82);
+  color:#6b5537;
+  text-decoration:none;
+  font:600 15px/1.25 system-ui,"Noto Sans TC",sans-serif;
+  letter-spacing:.03em;
+  box-shadow:0 6px 18px rgba(98,75,45,.08);
+}
+
+.parking-note{
+  margin-top:8px;
+  font-size:12px;
+  color:#8a7658;
+  line-height:1.5;
+}
+
+@media (orientation: landscape){
+  .parking-section{
+    width:min(80vw,680px);
+  }
+}
+
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -498,7 +589,7 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
     if(pointers.size>0)return;
     ++animId;
     active={type:'fold',which,startX:e.clientX,startY:e.clientY,startAmount:which==='left'?leftAmount:rightAmount,pid:e.pointerId};
-    if(!matchMedia('(orientation: landscape)').matches){e.currentTarget.setPointerCapture?.(e.pointerId);}
+    
 
   }
 
@@ -533,7 +624,7 @@ h1{margin:0 0 8px;font-size:clamp(21px,5vw,31px);letter-spacing:.12em}
       const dy=e.clientY-active.startY;
 
       /* 橫向手機：若使用者主要是上下滑，就交給瀏覽器捲動頁面 */
-      if(matchMedia('(orientation: landscape)').matches && Math.abs(dy)>10 && Math.abs(dy)>Math.abs(dx)*1.15){
+      if(Math.abs(dy)>10 && Math.abs(dy)>Math.abs(dx)*1.15){
         active=null;
         return;
       }
@@ -638,16 +729,30 @@ if ('serviceWorker' in navigator) {
 </section>
 
 <section class="map-section" aria-label="婚宴地圖導航">
-  <div class="map-title">婚宴地點導航</div>
-  <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%A1%83%E5%9C%92%E5%B8%82%E6%A1%83%E5%9C%92%E5%8D%80%E4%B8%AD%E6%AD%A3%E8%B7%AF19%E8%99%9F%20%E6%96%B0%E5%85%89%E4%B8%89%E8%B6%8A%E6%A1%83%E5%9C%92%E7%AB%99%E5%89%8D%E5%BA%9711%E6%A8%93" target="_blank" rel="noopener">
-    📍 開啟 Google 地圖導航
+  <div class="map-title">饗食天堂桃園新光店｜導航</div>
+  <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=%E9%A5%97%E9%A3%9F%E5%A4%A9%E5%A0%82%20%E6%A1%83%E5%9C%92%E6%96%B0%E5%85%89%E5%BA%97" target="_blank" rel="noopener">
+    📍 導航至饗食天堂桃園新光店
   </a>
-  <div class="map-address">桃園市桃園區中正路19號<br>新光三越桃園站前店 11 樓</div>
+  <div class="map-address">饗食天堂 桃園新光店<br>桃園市桃園區中正路19號・新光三越桃園站前店 11 樓</div>
+</section>
+
+
+<section class="parking-section" aria-label="備用停車場導航">
+  <div class="parking-title">備用停車場導航</div>
+  <div class="parking-buttons">
+    <a class="parking-link" href="https://www.google.com/maps/search/?api=1&query=%E6%87%89%E5%AE%89168%E5%81%9C%E8%BB%8A%E8%81%AF%E7%9B%9F%20%E6%A1%83%E5%9C%92%E5%90%89%E6%9E%97%E5%A0%B4" target="_blank" rel="noopener">
+      🚗 應安168停車聯盟・桃園吉林場
+    </a>
+    <a class="parking-link" href="https://www.google.com/maps/search/?api=1&query=%E4%BF%A5%E4%BA%AD%E5%A4%A7%E6%9E%97%E5%A0%B4%E5%81%9C%E8%BB%8A%E5%A0%B4" target="_blank" rel="noopener">
+      🚙 俥亭大林場停車場
+    </a>
+  </div>
+  <div class="parking-note">兩處皆位於桃園後火車站周邊，建議出發前先確認即時車位。</div>
 </section>
 
 <div class="form-link">
 <a href="https://docs.google.com/forms/d/e/1FAIpQLSewmdfTUdiDak1Z9oJ0RZ0blxqIcONW7fQYa8Q7NiDNdPrUSg/viewform?fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPNTY3MDY3MzQzMzUyNDI3AAGnhcjlD9DIIT_VmEZBtvNea5WEM_ozBL3Uoqxseu30cNCPIDVw-Kvjmuwtw4Y_aem_dXrz6mA1xJpQKOdoK3k9-g" target="_blank" rel="noopener">
-RSVP｜填寫婚宴回覆
+💌 填寫婚宴回覆
 </a>
 </div>
 
