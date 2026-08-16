@@ -1,23 +1,23 @@
 {
   "name": "宇誠＆婉儀｜婚禮電子喜帖",
-  "short_name": "宇誠＆婉儀",
+  "short_name": "P&M 喜帖",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
   "background_color": "#F8F1E6",
   "theme_color": "#F8F1E6",
-  "description": "宇誠＆婉儀互動式婚禮電子喜帖",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
